@@ -1,17 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using payment_gateway.Mapper;
 using payment_gateway.Mapper.Engine;
-using payment_gateway_repository.Model;
+using payment_gateway.Model;
 using payment_gateway.Services.Engine;
 using payment_gateway_core.Resolver.ResolverManager;
 using payment_gateway_core.Validation;
 using payment_gateway_repository.Engine.Repository;
+using User = payment_gateway_repository.Model.User;
 
 namespace payment_gateway.Controllers
 {
@@ -33,20 +30,20 @@ namespace payment_gateway.Controllers
         [AllowAnonymous]
         [Route("login")]
         [HttpPost]
-        public async Task<IActionResult> UserLogin([FromBody] Model.UserLogin model)
+        public async Task<ResponseModel> UserLogin([FromBody] UserLogin model)
         {
             //The User/Merchant will log in in order to process a payment and/or make requests for other actions
             var user = _userService.Authenticate(model.Username, model.Password, true);
             var validation = await new ValidatorManager(new LoginValidator(user)).Run();
             var response = new GlobalResultToResponse<User>().MapToDestination(validation);
-            return new OkObjectResult(response);
+            return response;
         }
 
         [AllowAnonymous]
         [Route("register")]
         [HttpPost]
 
-        public async Task<IActionResult> UserRegister([FromBody] Model.User model)
+        public async Task<ResponseModel> UserRegister([FromBody] Model.User model)
         {
             //For a User and in order to make a payment has to be registered in the system so we can process the data
             var user = _userService.Authenticate(model.UserLogin.Username, model.UserLogin.Password, false);
@@ -55,7 +52,7 @@ namespace payment_gateway.Controllers
             modelMap.UserLogin.Token = user.UserLogin.Token;
             var validation = await new ValidatorManager(new RegistrationValidator(modelMap, _repository)).Run();
             var response = new GlobalResultToResponse<User>().MapToDestination(validation);
-            return new OkObjectResult(response);
+            return response;
         }
 
     }

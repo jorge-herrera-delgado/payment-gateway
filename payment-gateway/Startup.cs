@@ -74,15 +74,32 @@ namespace payment_gateway
                     };
                 });
 
+            //Adding the repositories
             services.AddSingleton<IRepository<User>>(u => new UserRepository(repoBase));
             services.AddSingleton<IRepository<UserPayment>>(p => new UserPaymentsRepository(repoBase));
 
+            //The User Service for authentication
             services.AddScoped<IUserService, UserService>();
 
-            //swagger documentation
+            //swagger documentation.
+            //It is a basic concept for the swagger documentation.
+            //We can follow some steps here to setup with further details
+            //https://docs.microsoft.com/en-us/aspnet/core/tutorials/getting-started-with-swashbuckle?view=aspnetcore-3.1&tabs=visual-studio
+
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Payment Gateway", Version = "v1" });
+                c.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Version = "v1",
+                    Title = "Payment Gateway",
+                    Description = "Payment Gateway test for checkout.com",
+                    Contact = new OpenApiContact
+                    {
+                        Name = "Jorge Herrera Delgado",
+                        Email = "jorge.herrera.d@outlook.com",
+                        Url = new Uri("https://www.linkedin.com/in/jorge-herrera-delgado-3a1b816a/"),
+                    }
+                });
             });
         }
 

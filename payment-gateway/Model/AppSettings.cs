@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace payment_gateway.Model
+﻿namespace payment_gateway.Model
 {
     public class AppSettings
     {

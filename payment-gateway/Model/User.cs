@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
 using Newtonsoft.Json;
 
 namespace payment_gateway.Model
@@ -7,8 +8,8 @@ namespace payment_gateway.Model
     public class User
     {
         [JsonProperty("user-id")] public Guid UserId { get; set; } = Guid.NewGuid();
-        [JsonProperty("firstname")] public string FirstName { get; set; }
-        [JsonProperty("lastname")] public string LastName { get; set; }
-        [JsonProperty("login")] public UserLogin UserLogin { get; set; }
+        [JsonProperty("firstname")] [Required] public string FirstName { get; set; }
+        [JsonProperty("lastname")] [Required] public string LastName { get; set; }
+        [JsonProperty("login")] [Required] public UserLogin UserLogin { get; set; }
     }
 }

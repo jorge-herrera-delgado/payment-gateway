@@ -13,5 +13,6 @@ namespace payment_gateway_repository.Model
         [BsonElement("details")] public string Details { get; set; }
         [BsonElement("card-details")] public CardDetails CardDetails { get; set; }
         [BsonElement("payment")] public Payment Payment { get; set; }
+        [BsonElement("created")] public DateTime Created { get; set; } = DateTime.Now;
     }
 }
