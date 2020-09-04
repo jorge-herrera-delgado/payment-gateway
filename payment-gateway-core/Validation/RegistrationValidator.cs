@@ -2,42 +2,41 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using payment_gateway_core.Helper;
-using payment_gateway_core.Resolver.Engine;
 using payment_gateway_core.Validation.Engine;
 using payment_gateway_core.Validation.Validator;
-using payment_gateway_repository.Engine.Repository;
 using payment_gateway_repository.Model;
+using payment_gateway_repository.Repository.Contract;
 
 namespace payment_gateway_core.Validation
 {
-    public class RegistrationValidator : IValidatorManager
+    public class RegistrationValidator : IValidatorManager<User>
     {
-        private readonly User _user;
-        private readonly IRepository<User> _repository;
+        private readonly IUserRepository _userRepository;
+        private readonly ILogger<RegistrationValidator> _log;
 
         public object ReturnObject { get; private set; }
-
-        public RegistrationValidator(User user, IRepository<User> repository)
+        
+        public RegistrationValidator(IUserRepository userRepository, ILogger<RegistrationValidator> log)
         {
-            _user = user;
-            _repository = repository;
+            _userRepository = userRepository;
+            _log = log;
         }
 
         //if it needs to add more security and/or validation, we can add them based on requirements.
-        //Another way we can achieve this functionality could be by IOC container.
-        //All the assemblies under IValidator can be registered and then executed to get results.
-        public async Task<IEnumerable<Func<Result>>> GetValidatorsResult()
-        {
+        public async Task<IEnumerable<Func<Result>>> GetValidatorsResult(User model)
+         {
+             _log.LogInformation($"[Adding] Registration Validator results for: UserId: {model.UserId}");
             //we can filter properties to validate if are null or empty
-            var properties = _user.FilteredProperties().ToList();
-            properties.AddRange(_user.UserLogin.FilteredProperties());
+            var properties = model.FilteredProperties().ToList();
+            properties.AddRange(model.UserLogin.FilteredProperties());
             var listFunc = properties.Select(property => (Func<Result>)(() => new PropertyNullOrEmpty(property).Process())).ToList();
 
-            var model = await _repository.GetItemAsync(x => x.UserLogin.Username == _user.UserLogin.Username);
-            var list = new List<IValidator>
+            var resultModel = await _userRepository.GetItemAsync(x => x.UserLogin.Username == model.UserLogin.Username);
+             var list = new List<IValidator>
             {
-                new UserIncorrectAlreadyExists(model != null)
+                new UserIncorrectAlreadyExists(resultModel != null)
             };
             listFunc.AddRange(list.Select(validator => (Func<Result>)validator.Process));
             //we can add a validator to verify if password has min length
@@ -45,11 +44,10 @@ namespace payment_gateway_core.Validation
             //we can add a validator to verify if password has at least 1 uppercase
             //we can add a validator to verify if password has at least 1 special character
             //we can add other validators to verify the data
+            
+            ReturnObject = model;
 
-            //Here we validate if the data has been saved
-            listFunc.Add(() => new NoSavedToStorage(_repository.AddItemAsync(_user).Result, "User").Process());
-
-            ReturnObject = _user;
+            _log.LogInformation($"[Finished] Registration Validator results for: UserId: {model.UserId}");
 
             return listFunc;
         }

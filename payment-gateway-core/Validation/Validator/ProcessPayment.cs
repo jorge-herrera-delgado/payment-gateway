@@ -8,19 +8,19 @@ namespace payment_gateway_core.Validation.Validator
     public class ProcessPayment : IPaymentValidator
     {
         private readonly IBankProcessor _bankProcessor;
-        private readonly string _card;
+        private readonly payment_gateway_repository.Model.Payment _payment;
 
-        public ProcessPayment(IBankProcessor bankProcessor, string card)
+        public ProcessPayment(IBankProcessor bankProcessor, payment_gateway_repository.Model.Payment payment)
         {
             _bankProcessor = bankProcessor;
-            _card = card;
+            _payment = payment;
         }
 
         public Result Process()
         {
             var result = new Result();
-            var process = _bankProcessor.Process().Result;
-            if (process != null && process.GetType() != typeof(BraintreeHttp.HttpException))
+            var process = _bankProcessor.Process(_payment).Result;
+            if (process != null && process.GetType() != typeof(BraintreeHttp.HttpException) && process.GetType() != typeof(Exception))
                 return result;
 
             if (process?.GetType() == typeof(BraintreeHttp.HttpException))
@@ -33,7 +33,7 @@ namespace payment_gateway_core.Validation.Validator
             {
                 result.ErrorCode = ErrorCode.PaymentFailed;
                 result.StatusCode = StatusCode.Failed;
-                result.StatusDetail = $"The payment process has failed for the Card Number {_card.MaskStringValue(4)}";
+                result.StatusDetail = $"The payment process has failed for the Card Number {_payment.CardDetails.CardNumber.MaskStringValue(4)}";
             }
 
             return result;

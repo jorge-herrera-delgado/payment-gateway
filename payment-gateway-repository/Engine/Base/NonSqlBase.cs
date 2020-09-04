@@ -1,14 +1,7 @@
-﻿using payment_gateway_repository.Engine.Model;
-
-namespace payment_gateway_repository.Engine.Base
+﻿namespace payment_gateway_repository.Engine.Base
 {
-    public abstract class NonSqlBase<T>
+    public abstract class NonSqlBase<T, TSettings>
     {
-        protected ClientModel Client;
-        public ClientModel ClientBase
-        {
-            set => Client = value;
-        }
-        public abstract T OpenConnection();
+        public abstract T OpenConnection(TSettings settings);
     }
 }

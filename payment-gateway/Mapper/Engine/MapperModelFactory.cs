@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using payment_gateway.Model;
 using User = payment_gateway_repository.Model.User;
-using UserPayment = payment_gateway_repository.Model.UserPayment;
+using Payment = payment_gateway_repository.Model.Payment;
 
 namespace payment_gateway.Mapper.Engine
 {
@@ -15,10 +15,10 @@ namespace payment_gateway.Mapper.Engine
         {
             RegisterTypes.Add(typeof(Model.User), typeof(UserApiToRepo));
             RegisterTypes.Add(typeof(User), typeof(UserRepoToApi));
-            RegisterTypes.Add(typeof(Model.UserPayment), typeof(UserPaymentApiToRepo));
-            RegisterTypes.Add(typeof(UserPayment), typeof(UserPaymentRepoToApi));
+            RegisterTypes.Add(typeof(Model.Payment), typeof(PaymentApiToRepo));
+            RegisterTypes.Add(typeof(Payment), typeof(PaymentRepoToApi));
             RegisterTypes.Add(typeof(PaymentsFilter), typeof(PaymentFilterApiToCore));
-            RegisterTypes.Add(typeof(IEnumerable<UserPayment>), typeof(UserPaymentsRepoToApi));
+            RegisterTypes.Add(typeof(IEnumerable<Payment>), typeof(PaymentsRepoToApi));
         }
 
         public static IMapperModel<TSource, TDestination> GetMapper()

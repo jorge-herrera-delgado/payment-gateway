@@ -17,6 +17,7 @@ namespace payment_gateway.Mapper
             var response = new ResponseModel();
             if (source == null)
             {
+                response.Success = false;
                 response.Data = null;
                 response.TotalRecords = 0;
             }
@@ -44,6 +45,7 @@ namespace payment_gateway.Mapper
             var response = new ResponseModel();
             if (source == null)
             {
+                response.Success = false;
                 response.Data = null;
                 response.TotalRecords = 0;
             }

@@ -1,10 +1,18 @@
-﻿using MongoDB.Bson.Serialization.Attributes;
+﻿using System;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 
 namespace payment_gateway_repository.Model
 {
     public class Payment
     {
-        [BsonElement("amount")] public decimal Amount { get; set; }
-        [BsonElement("currency")] public string Currency { get; set; }
+        [BsonId, BsonRepresentation(BsonType.String)] public Guid PaymentId { get; set; } = Guid.NewGuid();
+        [BsonElement("user-id"), BsonRepresentation(BsonType.String)] public Guid UserId { get; set; }
+        [BsonElement("product-id")] public string ProductId { get; set; }
+        [BsonElement("product-name")] public string ProductName { get; set; }
+        [BsonElement("details")] public string Details { get; set; }
+        [BsonElement("card-details")] public CardDetails CardDetails { get; set; }
+        [BsonElement("price")] public Price Price { get; set; }
+        [BsonElement("created")] public DateTime Created { get; set; } = DateTime.Now;
     }
 }

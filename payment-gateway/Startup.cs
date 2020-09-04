@@ -1,30 +1,21 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.IO;
+using System.Reflection;
 using System.Text;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc.NewtonsoftJson;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using payment_gateway.AssemblyRegister;
 using payment_gateway.Filters;
 using payment_gateway.Model;
 using payment_gateway.Services;
 using payment_gateway.Services.Engine;
-using payment_gateway_repository.Engine.Base;
-using payment_gateway_repository.Engine.Model;
-using payment_gateway_repository.Engine.Repository;
-using payment_gateway_repository.Repository;
-using User = payment_gateway_repository.Model.User;
-using UserPayment = payment_gateway_repository.Model.UserPayment;
+using payment_gateway_core.Model;
 
 namespace payment_gateway
 {
@@ -44,13 +35,9 @@ namespace payment_gateway
 
             //gets the configuration from appsettings file
             //if we have the app in the cloud, the secrets can be stored in KeyVaults
-            var appSettingsSection = Configuration.GetSection("AppSettings");
+            var appSettingsSection = Configuration.GetSection(nameof(AppSettings));
             services.Configure<AppSettings>(appSettingsSection);
-
             var appSettings = appSettingsSection.Get<AppSettings>();
-            var dataBase = new MongoDataBase { ClientBase = new ClientModel { ConnectionString = appSettings.ConnectionString } };
-            var repoBase = new MongoRepositoryBase(dataBase);
-            var key = Encoding.ASCII.GetBytes(appSettings.Secret);
 
             services.AddMvc(opt => { opt.Filters.Add(typeof(JsonExceptionFilter)); });
             services.AddRouting(opt => opt.LowercaseUrls = true);
@@ -68,18 +55,26 @@ namespace payment_gateway
                     x.TokenValidationParameters = new TokenValidationParameters
                     {
                         ValidateIssuerSigningKey = true,
-                        IssuerSigningKey = new SymmetricSecurityKey(key),
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(appSettings.Secret)),
                         ValidateIssuer = false,
                         ValidateAudience = false
                     };
                 });
 
-            //Adding the repositories
-            services.AddSingleton<IRepository<User>>(u => new UserRepository(repoBase));
-            services.AddSingleton<IRepository<UserPayment>>(p => new UserPaymentsRepository(repoBase));
+            //Settings Registration
+            services.RegisterSettingOptions<PaypalSettings>(Configuration);
 
-            //The User Service for authentication
-            services.AddScoped<IUserService, UserService>();
+            //Repository Registration
+            services.RegisterRepositories(appSettings);
+
+            //Actions Registration
+            services.RegisterActions();
+
+            //Validation Registration
+            services.RegisterValidation();
+
+            //User Service Registration for authentication
+            services.AddSingleton<IUserService, UserService>();
 
             //swagger documentation.
             //It is a basic concept for the swagger documentation.
@@ -100,6 +95,11 @@ namespace payment_gateway
                         Url = new Uri("https://www.linkedin.com/in/jorge-herrera-delgado-3a1b816a/"),
                     }
                 });
+
+                // Set the comments path for the Swagger JSON and UI.
+                var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                c.IncludeXmlComments(xmlPath);
             });
         }
 
@@ -118,7 +118,6 @@ namespace payment_gateway
             app.UseSwaggerUI(c =>
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "Payment Gateway V1");
-                //c.RoutePrefix = string.Empty;
             });
 
             app.UseRouting();

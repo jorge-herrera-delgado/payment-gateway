@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Security.Authentication;
 using System.Threading.Tasks;
 using MongoDB.Driver;
 using payment_gateway_repository.Engine.Contract;
@@ -12,9 +13,11 @@ namespace payment_gateway_repository.Engine.Base
     public class MongoRepositoryBase : INonSqlDataSource
     {
         private readonly MongoClient _mongoClient;
-        public MongoRepositoryBase(NonSqlBase<MongoClient> nonSqlBase)
+        public MongoRepositoryBase(string connectionString)
         {
-            _mongoClient = nonSqlBase.OpenConnection();
+            var settings = MongoClientSettings.FromUrl(new MongoUrl(connectionString));
+            settings.SslSettings = new SslSettings { EnabledSslProtocols = SslProtocols.Tls12 | SslProtocols.None };
+            _mongoClient = new MongoDataBase().OpenConnection(settings);
         }
 
         #region Public Methods

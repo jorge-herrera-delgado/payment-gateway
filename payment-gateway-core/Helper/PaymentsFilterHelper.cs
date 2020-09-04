@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Linq;
 using payment_gateway_core.Model;
-using payment_gateway_repository.Model;
 
 namespace payment_gateway_core.Helper
 {
     public static class PaymentsFilterHelper
     {
-        public static IQueryable<UserPayment> GetPaymentsQueryable(this IQueryable<UserPayment> payments, PaymentsFilter filter)
+        public static IQueryable<payment_gateway_repository.Model.Payment> GetPaymentsQueryable(this IQueryable<payment_gateway_repository.Model.Payment> payments, PaymentsFilter filter)
         {
             if(payments == null)
                 throw new ArgumentOutOfRangeException(nameof(payments), "There are no payments to filter.");

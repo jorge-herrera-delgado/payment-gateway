@@ -7,19 +7,19 @@ using Microsoft.IdentityModel.Tokens;
 using payment_gateway.Helper;
 using payment_gateway.Model;
 using payment_gateway.Services.Engine;
-using payment_gateway_repository.Engine.Repository;
+using payment_gateway_repository.Repository.Contract;
 using Repo = payment_gateway_repository.Model;
 
 namespace payment_gateway.Services
 {
     public class UserService : IUserService
     {
+        private readonly IUserRepository _repository;
         private readonly AppSettings _appSettings;
-
-        public IRepository<Repo.User> Repository { get; set; }
-
-        public UserService(IOptions<AppSettings> appSettings)
+        
+        public UserService(IUserRepository repository, IOptions<AppSettings> appSettings)
         {
+            _repository = repository;
             _appSettings = appSettings.Value;
         }
 
@@ -30,8 +30,7 @@ namespace payment_gateway.Services
             var user = new Repo.User();
             if (isRegistered)
             {
-                user = Repository.GetItem(
-                    x => x.UserLogin.Username == username && x.UserLogin.Password == password);
+                user = _repository.GetItem(x => x.UserLogin.Username == username && x.UserLogin.Password == password);
 
                 return user;
             }

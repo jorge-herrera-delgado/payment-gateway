@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 
 namespace payment_gateway_core.Helper
 {
@@ -48,6 +47,14 @@ namespace payment_gateway_core.Helper
             var show = value.Substring(lng - numLast, numLast);
             var rest = lng - show.Length;
             return new string('*', rest) + show;
+        }
+
+        public static int ConvertToInt(this object value)
+        {
+            var sourceType = value.GetType();
+            if (!sourceType.IsEnum)
+                throw new ArgumentException("Source type is not enum");
+            return (int)value;
         }
     }
 }

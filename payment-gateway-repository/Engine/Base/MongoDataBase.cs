@@ -2,9 +2,9 @@
 
 namespace payment_gateway_repository.Engine.Base
 {
-    public sealed class MongoDataBase : NonSqlBase<MongoClient>
+    public sealed class MongoDataBase : NonSqlBase<MongoClient, MongoClientSettings>
     {
-        public override MongoClient OpenConnection()
-            => new MongoClient(Client.ConnectionString);
+        public override MongoClient OpenConnection(MongoClientSettings settings)
+            => new MongoClient(settings);
     }
 }
