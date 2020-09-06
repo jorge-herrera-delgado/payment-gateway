@@ -21,7 +21,9 @@ namespace payment_gateway.Services
         {
             var t = typeof(TAction);
 
-            return _listActions.FirstOrDefault(x => x.GetType() == t) is IAction action
+            var result = _listActions.FirstOrDefault(x => x.GetType() == t);
+
+            return result is IAction action
                 ? await action.ProcessAction(model)
                 : throw new ArgumentNullException($"'{t}' hasn't been found or hasn't been implemented.");
         }

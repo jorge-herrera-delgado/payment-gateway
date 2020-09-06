@@ -11,7 +11,7 @@ using payment_gateway_repository.Repository.Contract;
 
 namespace payment_gateway_core.Validation
 {
-    public class RegistrationValidator : IValidatorManager<User>
+    public class RegistrationValidator : IValidatorManager<RegistrationValidator, User>
     {
         private readonly IUserRepository _userRepository;
         private readonly ILogger<RegistrationValidator> _log;

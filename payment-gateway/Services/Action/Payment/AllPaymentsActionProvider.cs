@@ -7,6 +7,7 @@ using payment_gateway.Services.Action.Engine;
 using payment_gateway.Services.Engine;
 using payment_gateway_core.Helper;
 using payment_gateway.Model;
+using payment_gateway_core.Validation;
 using payment_gateway_core.Validation.Engine;
 using payment_gateway_repository.Repository.Contract;
 using CoreModel = payment_gateway_core.Model;
@@ -16,13 +17,13 @@ namespace payment_gateway.Services.Action.Payment
     public class AllPaymentsActionProvider : IAction
     {
         private readonly IValidationService _validationService;
-        private readonly IValidatorManager<CoreModel.PaymentsFilter> _validator;
+        private readonly IValidatorManager<AllPaymentsValidator, CoreModel.PaymentsFilter> _validator;
         private readonly IPaymentRepository _repository;
         private readonly ILogger<AllPaymentsActionProvider> _log;
 
         public AllPaymentsActionProvider(
             IValidationService validationService,
-            IValidatorManager<CoreModel.PaymentsFilter> validator,
+            IValidatorManager<AllPaymentsValidator, CoreModel.PaymentsFilter> validator,
             IPaymentRepository repository,
             ILogger<AllPaymentsActionProvider> log)
         {

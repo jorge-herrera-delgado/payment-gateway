@@ -94,7 +94,7 @@ namespace payment_gateway_test.ControllersTest.UserControllerTest
             //Arrange
             var controller = new UserController(_mockActService.Object, _log);
             //Act
-            var result = controller.UserLogin(null).Result;
+            var result = controller.UserRegister(null).Result;
             //Assert
             Assert.IsNotNull(result);
             Assert.IsFalse(result.Success);

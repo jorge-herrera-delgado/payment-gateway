@@ -8,6 +8,7 @@ using payment_gateway.Mapper;
 using payment_gateway.Services.Action.Payment;
 using payment_gateway.Services.Engine;
 using payment_gateway_core.Payment.Engine;
+using payment_gateway_core.Validation;
 using payment_gateway_core.Validation.Engine;
 using payment_gateway_repository.Repository.Contract;
 using RepoModel = payment_gateway_repository.Model;
@@ -25,7 +26,7 @@ namespace payment_gateway_test.ActionTest
         private Mock<IPaymentRepository> _mockRepoTrue;
         private Mock<IPaymentRepository> _mockRepoFalse;
         private Mock<IValidationService> _mockValService;
-        private Mock<IValidatorManager<RepoModel.Payment>> _mockValManager;
+        private Mock<IValidatorManager<PaymentValidator, RepoModel.Payment>> _mockValManager;
         private Mock<IBankProcessor> _mockBankProcessorObj;
         private Mock<IBankProcessor> _mockBankProcessorEx;
 
@@ -79,7 +80,7 @@ namespace payment_gateway_test.ActionTest
             _mockRepoTrue.Setup(r => r.AddItemAsync(It.IsAny<RepoModel.Payment>())).Returns(Task.FromResult(true));
             _mockRepoFalse = new Mock<IPaymentRepository>();
             _mockRepoFalse.Setup(r => r.AddItemAsync(It.IsAny<RepoModel.Payment>())).Returns(Task.FromResult(false));
-            _mockValManager = new Mock<IValidatorManager<RepoModel.Payment>>();
+            _mockValManager = new Mock<IValidatorManager<PaymentValidator, RepoModel.Payment>>();
             _mockValManager.Setup(m => m.GetValidatorsResult(It.IsAny<RepoModel.Payment>()))
                 .Returns(Task.FromResult(It.IsAny<IEnumerable<Func<Result>>>()));
             _mockValService = new Mock<IValidationService>();
@@ -121,7 +122,7 @@ namespace payment_gateway_test.ActionTest
             //Returns an error result in validation
             var mockValService = new Mock<IValidationService>();
             mockValService.Setup(v =>
-                    v.ProcessValidation(It.IsAny<IValidatorManager<RepoModel.Payment>>(),
+                    v.ProcessValidation(It.IsAny<IValidatorManager<PaymentValidator, RepoModel.Payment>>(),
                         It.IsAny<RepoModel.Payment>()))
                 .Returns(
                     Task.FromResult(new Result

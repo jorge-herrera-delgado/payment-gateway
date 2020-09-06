@@ -25,6 +25,8 @@ namespace payment_gateway_repository.Engine.Contract
         Task<bool> DeleteAsync<T>(NonSqlSchema nonSqlSchema, Expression<Func<T, bool>> filter);
         bool DeleteRange<T>(NonSqlSchema nonSqlSchema, Expression<Func<T, bool>> filter);
         Task<bool> DeleteRangeAsync<T>(NonSqlSchema nonSqlSchema, Expression<Func<T, bool>> filter);
+        Task<bool> UpdateAsync<T>(NonSqlSchema nonSqlSchema, Expression<Func<T, bool>> filter, IDictionary<string, object> updateParameters);
+        Task<bool> UpdateAsync<T, TField>(NonSqlSchema nonSqlSchema, Expression<Func<T, bool>> filter, Expression<Func<T, TField>> updateExp, TField value);
         bool Update<T>(NonSqlSchema nonSqlSchema, Expression<Func<T, bool>> filter, IDictionary<string, object> updateParameters);
         bool Update<T, TField>(NonSqlSchema nonSqlSchema, Expression<Func<T, bool>> filter, Expression<Func<T, TField>> updateExp, TField value);
         bool Replace<TDocument>(NonSqlSchema nonSqlSchema, Expression<Func<TDocument, bool>> filter, TDocument newDocument);

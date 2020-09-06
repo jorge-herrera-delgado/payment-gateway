@@ -8,6 +8,7 @@ using Moq;
 using payment_gateway.Mapper;
 using payment_gateway.Services.Action.Payment;
 using payment_gateway.Services.Engine;
+using payment_gateway_core.Validation;
 using payment_gateway_core.Validation.Engine;
 using payment_gateway_repository.Repository.Contract;
 using RepoModel = payment_gateway_repository.Model;
@@ -23,7 +24,7 @@ namespace payment_gateway_test.ActionTest
         private ILogger<LastPaymentsActionProvider> _log;
         private Mock<IPaymentRepository> _mockRepo;
         private Mock<IValidationService> _mockVaService;
-        private Mock<IValidatorManager<string>> _mockValManager;
+        private Mock<IValidatorManager<LastPaymentValidator, string>> _mockValManager;
 
         [TestInitialize]
         public void Init()
@@ -61,7 +62,7 @@ namespace payment_gateway_test.ActionTest
             //Mock
             _mockRepo = new Mock<IPaymentRepository>();
             _mockRepo.Setup(r => r.GetMongoQueryable()).Returns(payments);
-            _mockValManager = new Mock<IValidatorManager<string>>();
+            _mockValManager = new Mock<IValidatorManager<LastPaymentValidator, string>>();
             _mockValManager.Setup(m => m.GetValidatorsResult(It.IsAny<string>())).Returns(Task.FromResult(It.IsAny<IEnumerable<Func<Result>>>()));
             _mockVaService = new Mock<IValidationService>();
             _mockVaService.Setup(v => v.ProcessValidation(_mockValManager.Object, It.IsAny<string>()))

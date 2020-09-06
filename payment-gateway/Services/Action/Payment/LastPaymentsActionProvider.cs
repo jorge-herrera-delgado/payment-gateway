@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using payment_gateway.Services.Action.Engine;
 using payment_gateway.Services.Engine;
 using payment_gateway_core.Helper;
+using payment_gateway_core.Validation;
 using payment_gateway_core.Validation.Engine;
 using payment_gateway_repository.Repository.Contract;
 
@@ -13,13 +14,13 @@ namespace payment_gateway.Services.Action.Payment
     public class LastPaymentsActionProvider : IAction
     {
         private readonly IValidationService _validationService;
-        private readonly IValidatorManager<string> _validator;
+        private readonly IValidatorManager<LastPaymentValidator, string> _validator;
         private readonly IPaymentRepository _repository;
         private readonly ILogger<LastPaymentsActionProvider> _log;
 
         public LastPaymentsActionProvider(
             IValidationService validationService,
-            IValidatorManager<string> validator,
+            IValidatorManager<LastPaymentValidator, string> validator,
             IPaymentRepository repository,
             ILogger<LastPaymentsActionProvider> log)
         {

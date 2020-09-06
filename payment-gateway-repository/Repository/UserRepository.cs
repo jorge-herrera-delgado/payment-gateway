@@ -24,5 +24,8 @@ namespace payment_gateway_repository.Repository
 
         public Task<bool> AddItemAsync(User value)
             => NonSqlDataSource.InsertAsync(NonSqlSchema, value);
+
+        public Task<bool> UpdateItemAsync<TField>(User value, Expression<Func<User, TField>> updateExp, TField tvalue)
+            => NonSqlDataSource.UpdateAsync(NonSqlSchema, x => x.UserId == value.UserId, updateExp, tvalue);
     }
 }

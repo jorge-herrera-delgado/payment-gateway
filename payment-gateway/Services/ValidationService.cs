@@ -6,7 +6,9 @@ namespace payment_gateway.Services
 {
     public class ValidationService : IValidationService
     {
-        public Task<object> ProcessValidation<TModel>(IValidatorManager<TModel> validator, TModel model) where TModel : class
+        public Task<object> ProcessValidation<TClass, TModel>(IValidatorManager<TClass, TModel> validator, TModel model) 
+            where TClass : class 
+            where TModel : class
         {
             foreach (var itemFunc in validator.GetValidatorsResult(model).Result)
             {

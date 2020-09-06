@@ -5,6 +5,8 @@ namespace payment_gateway.Services.Engine
 {
     public interface IValidationService
     {
-        Task<object> ProcessValidation<TModel>(IValidatorManager<TModel> validator, TModel model) where TModel : class;
+        Task<object> ProcessValidation<TClass, TModel>(IValidatorManager<TClass, TModel> validator, TModel model)
+            where TClass : class
+            where TModel : class;
     }
 }

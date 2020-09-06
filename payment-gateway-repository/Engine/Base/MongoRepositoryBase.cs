@@ -158,6 +158,22 @@ namespace payment_gateway_repository.Engine.Base
             return status.IsAcknowledged && status.ModifiedCount > 0;
         }
 
+        public Task<bool> UpdateAsync<T>(NonSqlSchema nonSqlSchema, Expression<Func<T, bool>> filter, IDictionary<string, object> updateParameters)
+        {
+            var mDb = _mongoClient.GetDatabase(nonSqlSchema.DataBaseName);
+            var collection = mDb.GetCollection<T>(nonSqlSchema.CollectionName);
+            var status = collection.UpdateOneAsync(filter, GetUpdateDefinition<T>(updateParameters)).Result;
+            return Task.FromResult(status.IsAcknowledged && status.ModifiedCount > 0);
+        }
+
+        public Task<bool> UpdateAsync<T, TField>(NonSqlSchema nonSqlSchema, Expression<Func<T, bool>> filter, Expression<Func<T, TField>> updateExp, TField value)
+        {
+            var mDb = _mongoClient.GetDatabase(nonSqlSchema.DataBaseName);
+            var collection = mDb.GetCollection<T>(nonSqlSchema.CollectionName);
+            var status = collection.UpdateOneAsync(filter, GetUpdateDefinition(updateExp, value)).Result;
+            return Task.FromResult(status.IsAcknowledged && status.ModifiedCount > 0);
+        }
+
         public bool Replace<TDocument>(NonSqlSchema nonSqlSchema, Expression<Func<TDocument, bool>> filter, TDocument newDocument)
         {
             var mDb = _mongoClient.GetDatabase(nonSqlSchema.DataBaseName);

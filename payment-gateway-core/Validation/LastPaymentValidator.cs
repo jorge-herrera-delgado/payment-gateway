@@ -8,7 +8,7 @@ using payment_gateway_repository.Repository.Contract;
 
 namespace payment_gateway_core.Validation
 {
-    public class LastPaymentValidator : IValidatorManager<string>
+    public class LastPaymentValidator : IValidatorManager<LastPaymentValidator, string>
     {
         private readonly IUserRepository _userRepository;
         private readonly ILogger<LastPaymentValidator> _log;

@@ -5,6 +5,7 @@ namespace payment_gateway.Services.Engine
 {
     public interface IUserService
     {
-        User Authenticate(string username, string password, bool isRegistered);
+        string Authenticate(User user, bool isRegistered);
+        string GenerateToken(string userId);
     }
 }

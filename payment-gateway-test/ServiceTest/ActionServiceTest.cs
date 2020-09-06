@@ -1,39 +1,29 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System;
+using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using payment_gateway.AssemblyRegister;
-using payment_gateway.Model;
+using Moq;
 using payment_gateway.Services;
-using payment_gateway.Services.Action.User;
+using payment_gateway.Services.Action.Engine;
 
 namespace payment_gateway_test.ServiceTest
 {
     [TestClass]
     public class ActionServiceTest
     {
-        [TestInitialize]
-        public void Init()
-        {
-        }
-
         [TestMethod]
-        public void ActionService_Successful()
+        public void ActionService_AggregateException_Failed()
         {
-            ////Mock
-
-            ////var mockAction = new Mock<IAction>();
-            ////mockAction.Setup(a => a.ProcessAction(It.IsAny<object>())).Returns(Task.FromResult((object)new RepoModel.User()));
-            //var sc = new ServiceCollection();
-            ////var mock = new Mock<IActionService>();
-            //sc.RegisterActions();
-            //sc.RegisterRepositories(new AppSettings{ConnectionString = string.Empty});
-            //sc.RegisterValidation();
-            //var sp = sc.BuildServiceProvider();
-            ////Arrange
-            //var service = new ActionService(sp);
-            ////Act
-            //var result = service.ProcessAction<LoginAction>(null).Result;
-            ////Assert
-            //Assert.IsNotNull(result);
+            //Mock
+            var mockAction = new Mock<IAction>();
+            mockAction.Setup(c => c.ProcessAction(string.Empty)).Returns(Task.FromResult(default(object)));
+            //Arrange
+            var sc = new ServiceCollection();
+            sc.AddSingleton(provider => mockAction.Object);
+            var sp = sc.BuildServiceProvider();
+            var service = new ActionService(sp);
+            //Act and Assert
+            Assert.ThrowsExceptionAsync<AggregateException>(() => service.ProcessAction<IAction>(string.Empty), "Not found or not implemented.");
         }
     }
 }

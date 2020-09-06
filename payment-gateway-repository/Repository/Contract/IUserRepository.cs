@@ -14,5 +14,6 @@ namespace payment_gateway_repository.Repository.Contract
         Task<User> GetItemAsync(Expression<Func<User, bool>> filter);
         IQueryable<User> GetMongoQueryable();
         Task<bool> AddItemAsync(User value);
+        Task<bool> UpdateItemAsync<TField>(User value, Expression<Func<User, TField>> updateExp, TField tvalue);
     }
 }

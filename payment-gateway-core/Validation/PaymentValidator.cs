@@ -10,7 +10,7 @@ using payment_gateway_repository.Repository.Contract;
 
 namespace payment_gateway_core.Validation
 {
-    public class PaymentValidator : IValidatorManager<payment_gateway_repository.Model.Payment>
+    public class PaymentValidator : IValidatorManager<PaymentValidator, payment_gateway_repository.Model.Payment>
     {
         private readonly IUserRepository _repositoryUser;
         private readonly ILogger<PaymentValidator> _log;

@@ -7,6 +7,7 @@ using Moq;
 using payment_gateway.Mapper;
 using payment_gateway.Services.Action.User;
 using payment_gateway.Services.Engine;
+using payment_gateway_core.Validation;
 using payment_gateway_core.Validation.Engine;
 using payment_gateway_repository.Repository.Contract;
 using RepoModel = payment_gateway_repository.Model;
@@ -24,7 +25,7 @@ namespace payment_gateway_test.ActionTest
         private Mock<IUserRepository> _mockRepoTrue;
         private Mock<IUserRepository> _mockRepoFalse;
         private Mock<IUserService> _mockUsService;
-        private Mock<IValidatorManager<RepoModel.User>> _mockValManager;
+        private Mock<IValidatorManager<RegistrationValidator, RepoModel.User>> _mockValManager;
         private Mock<IValidationService> _mockValService;
 
         [TestInitialize]
@@ -55,9 +56,9 @@ namespace payment_gateway_test.ActionTest
             _mockRepoFalse.Setup(r => r.AddItemAsync(It.IsAny<RepoModel.User>())).Returns(Task.FromResult(false));
 
             _mockUsService = new Mock<IUserService>();
-            _mockUsService.Setup(s => s.Authenticate(It.IsAny<string>(), It.IsAny<string>(), false)).Returns(_userRepo);
+            _mockUsService.Setup(s => s.Authenticate(It.IsAny<RepoModel.User>(), false)).Returns(_userRepo.UserLogin.Token);
 
-            _mockValManager = new Mock<IValidatorManager<RepoModel.User>>();
+            _mockValManager = new Mock<IValidatorManager<RegistrationValidator, RepoModel.User>>();
             _mockValManager.Setup(m => m.GetValidatorsResult(It.IsAny<RepoModel.User>()))
                 .Returns(Task.FromResult(It.IsAny<IEnumerable<Func<Result>>>()));
 

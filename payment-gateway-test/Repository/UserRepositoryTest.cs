@@ -51,6 +51,18 @@ namespace payment_gateway_test.Repository
 
                     return Task.FromResult(u.UserId != _user.UserId);
                 });
+
+            _mockDataSource.Setup(x =>
+                x.UpdateAsync(It.IsAny<NonSqlSchema>(), It.IsAny<Expression<Func<User, bool>>>(),
+                    It.IsAny<Expression<Func<User, string>>>(), It.IsAny<string>())).ReturnsAsync(
+                (NonSqlSchema s, Expression<Func<User, bool>> f, Expression<Func<User, string>> e, string v) =>
+                {
+                    if (v == null)
+                        throw new NullReferenceException("Test Null Exception for User");
+
+                    return v == true.ToString();
+                });
+
         }
 
         [TestMethod]
@@ -142,7 +154,7 @@ namespace payment_gateway_test.Repository
         }
 
         [TestMethod]
-        public void UserRepository_AddItemAsync_Payment_Already_Exists_Failed()
+        public void UserRepository_AddItemAsync_Already_Exists_Failed()
         {
             //Arrange
             var repo = new UserRepository(_mockDataSource.Object);
@@ -154,12 +166,46 @@ namespace payment_gateway_test.Repository
         }
 
         [TestMethod]
-        public void UserRepository_NullReferenceException_Failed()
+        public void UserRepository_AddItemAsync_NullReferenceException_Failed()
         {
             //Arrange
             var repo = new UserRepository(_mockDataSource.Object);
             //Act and Assert
             Assert.ThrowsExceptionAsync<NullReferenceException>(() => repo.AddItemAsync(null), "Null Reference Exception. Parameter cannot be null.");
+        }
+
+        [TestMethod]
+        public void UserRepository_UpdateItemAsync_User_No_Exists_Failed()
+        {
+            //Arrange
+            var repo = new UserRepository(_mockDataSource.Object);
+            //Act
+            //Simulates a Non Existing user in Storage
+            var result = repo.UpdateItemAsync(_user, u => u.FirstName, false.ToString()).Result;
+            //Assert
+            Assert.IsNotNull(result);
+            Assert.IsFalse(result);
+        }
+
+        [TestMethod]
+        public void UserRepository_UpdateItemAsync_Already_Exists_Successful()
+        {
+            //Arrange
+            var repo = new UserRepository(_mockDataSource.Object);
+            //Act
+            var result = repo.UpdateItemAsync(_user, u => u.FirstName, true.ToString()).Result;
+            //Assert
+            Assert.IsNotNull(result);
+            Assert.IsTrue(result);
+        }
+
+        [TestMethod]
+        public void UserRepository_UpdateItemAsync_NullReferenceException_Failed()
+        {
+            //Arrange
+            var repo = new UserRepository(_mockDataSource.Object);
+            //Act and Assert
+            Assert.ThrowsExceptionAsync<NullReferenceException>(() => repo.UpdateItemAsync(_user, u => u.FirstName, null), "Null Reference Exception. Parameter cannot be null.");
         }
     }
 }

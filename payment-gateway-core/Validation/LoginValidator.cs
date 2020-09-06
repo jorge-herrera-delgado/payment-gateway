@@ -8,7 +8,7 @@ using payment_gateway_repository.Model;
 
 namespace payment_gateway_core.Validation
 {
-    public class LoginValidator : IValidatorManager<User>
+    public class LoginValidator : IValidatorManager<LoginValidator, User>
     {
         private readonly ILogger<LoginValidator> _log;
         public object ReturnObject { get; private set; }
@@ -22,6 +22,7 @@ namespace payment_gateway_core.Validation
         public Task<IEnumerable<Func<Result>>> GetValidatorsResult(User model)
         {
             _log.LogInformation($"[Adding] Login Validator results for: UserId: {model?.UserId}");
+
             var listFunc = new List<Func<Result>>
             {
                 () => new ObjectNull(model, "Username or password is incorrect", ErrorCode.NoAuthorized).Process()

@@ -1,14 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using payment_gateway.Model;
 using payment_gateway.Services;
-using payment_gateway_repository.Repository.Contract;
 using RepoModel = payment_gateway_repository.Model;
 
 namespace payment_gateway_test.ServiceTest
@@ -17,8 +12,6 @@ namespace payment_gateway_test.ServiceTest
     public class UserServiceTest
     {
         private RepoModel.User _userRepo;
-        private Mock<IUserRepository> _mockRepoTrue;
-        private Mock<IUserRepository> _mockRepoFalse;
         private Mock<IOptions<AppSettings>> _mockSettings;
 
         [TestInitialize]
@@ -37,45 +30,65 @@ namespace payment_gateway_test.ServiceTest
                 UserLogin = new RepoModel.UserLogin
                 {
                     Username = "TestUser",
-                    Password = "123456",
-                    Token = "1234564asd4987das65d4as65d4sa6d5132s1gfd5g1"
+                    Password = "123456"
                 }
             };
 
             //Mock
-            _mockRepoTrue = new Mock<IUserRepository>();
-            _mockRepoTrue.Setup(r => r.GetItem(It.IsAny<Expression<Func<RepoModel.User, bool>>>())).Returns(_userRepo);
-
-            _mockRepoFalse = new Mock<IUserRepository>();
-            _mockRepoFalse.Setup(r => r.GetItem(It.IsAny<Expression<Func<RepoModel.User, bool>>>())).Returns<RepoModel.User>(null);
-
             _mockSettings = new Mock<IOptions<AppSettings>>();
             _mockSettings.Setup(s => s.Value).Returns(appSettings);
         }
 
         [TestMethod]
-        public void UserService_Authenticate_Registered_User_Successful()
+        public void UserService_Authenticate_Registered_User_ValidToken_Successful()
         {
             //Arrange
-            var service = new UserService(_mockRepoTrue.Object, _mockSettings.Object);
+            var service = new UserService(_mockSettings.Object);
             //Act
-            var result = service.Authenticate(_userRepo.UserLogin.Username, _userRepo.UserLogin.Password, true);
+            //Simulates a Valid Token
+            _userRepo.UserLogin.Token = service.GenerateToken(_userRepo.UserId.ToString());
+            var result = service.Authenticate(_userRepo, true);
             //Assert
             Assert.IsNotNull(result);
-            Assert.IsTrue(!string.IsNullOrEmpty(result.UserLogin.Password));
+            Assert.IsTrue(!string.IsNullOrEmpty(result));
+            Assert.IsTrue(result == _userRepo.UserLogin.Token);
+        }
+
+        [TestMethod]
+        public void UserService_Authenticate_Registered_User_InvalidToken_Successful()
+        {
+            //Arrange
+            var service = new UserService(_mockSettings.Object);
+            //Act
+            //Simulates an Invalid Token
+            _userRepo.UserLogin.Token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IjA1NjE4MGQzLTM2MjItNDc4OC05MmNmLWY3OGEzOWFiMTI2MSIsIm5iZiI6MTU4NzU1Nzk5NCwiZXhwIjoxNTg4MTYyNzk0LCJpYXQiOjE1ODc1NTc5OTR9.bVf1zOIW2f4OsYxMXTiVLMh0QdOc8uVPG7MeitRbNUw";
+            var result = service.Authenticate(_userRepo, true);
+            //Assert
+            Assert.IsNotNull(result);
+            Assert.IsTrue(!string.IsNullOrEmpty(result));
+            Assert.IsTrue(result != _userRepo.UserLogin.Token);
         }
 
         [TestMethod]
         public void UserService_Authenticate_New_User_Successful()
         {
             //Arrange
-            var service = new UserService(_mockRepoFalse.Object, _mockSettings.Object);
+            var service = new UserService(_mockSettings.Object);
             //Act
-            var result = service.Authenticate(_userRepo.UserLogin.Username, _userRepo.UserLogin.Password, false);
+            var result = service.Authenticate(_userRepo, false);
             //Assert
-            Assert.IsNotNull(result);
-            Assert.IsTrue(string.IsNullOrEmpty(result.UserLogin.Password));
-            Assert.IsTrue(!string.IsNullOrEmpty(result.UserLogin.Token));
+            Assert.IsTrue(!string.IsNullOrEmpty(result));
+        }
+
+        [TestMethod]
+        public void UserService_GenerateToken_Successful()
+        {
+            //Arrange
+            var service = new UserService(_mockSettings.Object);
+            //Act
+            var result = service.GenerateToken(_userRepo.UserId.ToString());
+            //Assert
+            Assert.IsTrue(!string.IsNullOrEmpty(result));
         }
     }
 }

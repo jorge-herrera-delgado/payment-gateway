@@ -14,11 +14,11 @@ namespace payment_gateway.AssemblyRegister
         {
             service.AddSingleton<IValidationService, ValidationService>();
 
-            service.AddSingleton<IValidatorManager<RepoModel.Payment>, PaymentValidator>()
-                .AddSingleton<IValidatorManager<RepoModel.User>, LoginValidator>()
-                .AddSingleton<IValidatorManager<RepoModel.User>, RegistrationValidator>()
-                .AddSingleton<IValidatorManager<string>, LastPaymentValidator>()
-                .AddSingleton<IValidatorManager<CoreModel.PaymentsFilter>, AllPaymentsValidator>();
+            service.AddSingleton<IValidatorManager<PaymentValidator, RepoModel.Payment>, PaymentValidator>()
+                .AddSingleton<IValidatorManager<LoginValidator, RepoModel.User>, LoginValidator>()
+                .AddSingleton<IValidatorManager<RegistrationValidator, RepoModel.User>, RegistrationValidator>()
+                .AddSingleton<IValidatorManager<LastPaymentValidator, string>, LastPaymentValidator>()
+                .AddSingleton<IValidatorManager<AllPaymentsValidator, CoreModel.PaymentsFilter>, AllPaymentsValidator>();
         }
     }
 }

@@ -6,6 +6,7 @@ using payment_gateway.Services.Action.Engine;
 using payment_gateway.Services.Engine;
 using payment_gateway_core.Helper;
 using payment_gateway_core.Payment.Engine;
+using payment_gateway_core.Validation;
 using payment_gateway_core.Validation.Engine;
 using payment_gateway_core.Validation.Validator;
 using payment_gateway_repository.Repository.Contract;
@@ -17,13 +18,13 @@ namespace payment_gateway.Services.Action.Payment
         private readonly IPaymentRepository _repository;
         private readonly IValidationService _validationService;
         private readonly IBankProcessor _bankProcessor;
-        private readonly IValidatorManager<payment_gateway_repository.Model.Payment> _validator;
+        private readonly IValidatorManager<PaymentValidator, payment_gateway_repository.Model.Payment> _validator;
         private readonly ILogger<ProcessPaymentAction> _log;
 
         public ProcessPaymentAction(IPaymentRepository repository,
             IValidationService validationService,
             IBankProcessor bankProcessor,
-            IValidatorManager<payment_gateway_repository.Model.Payment> validator,
+            IValidatorManager<PaymentValidator, payment_gateway_repository.Model.Payment> validator,
             ILogger<ProcessPaymentAction> log)
         {
             _repository = repository;

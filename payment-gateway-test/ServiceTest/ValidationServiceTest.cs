@@ -17,7 +17,7 @@ namespace payment_gateway_test.ServiceTest
     {
         private RepoModel.User _userRepo;
         private ApiModel.User _userApi;
-        private Mock<IValidatorManager<RepoModel.User>> _mockValManager;
+        private Mock<IValidatorManager<object, RepoModel.User>> _mockValManager;
 
         [TestInitialize]
         public void Init()
@@ -36,7 +36,7 @@ namespace payment_gateway_test.ServiceTest
             };
             _userRepo = new UserApiToRepo().MapToDestination(_userApi);
 
-            _mockValManager = new Mock<IValidatorManager<RepoModel.User>>();
+            _mockValManager = new Mock<IValidatorManager<object, RepoModel.User>>();
             
         }
 
